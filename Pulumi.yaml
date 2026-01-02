@@ -1,0 +1,12 @@
+name: k8s-setup
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+main: src/index.ts
+description: Cloud-agnostic Kubernetes cluster deployment (AWS EKS, GCP GKE, Azure AKS)
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: kubernetes-cloud-agnostic
+

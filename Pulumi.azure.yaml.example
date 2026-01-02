@@ -1,0 +1,23 @@
+# Example Pulumi stack configuration for Azure AKS
+# Copy this file to Pulumi.<stack-name>.yaml and fill in your values
+config:
+  k8s-setup:cloudProvider: azure
+  k8s-setup:region: westeurope
+  k8s-setup:environment: dev
+  k8s-setup:projectName: my-k8s
+  k8s-setup:kubernetesVersion: "1.33"
+  # Replace with your desired resource group name
+  k8s-setup:azureResourceGroup: my-k8s-rg
+  k8s-setup:nodePools: |-
+    [
+      {
+        "name": "default",
+        "instanceSize": "small",
+        "minSize": 1,
+        "maxSize": 3,
+        "desiredSize": 1,
+        "diskSizeGb": 30,
+        "labels": { "role": "worker" }
+      }
+    ]
+

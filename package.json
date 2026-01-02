@@ -1,0 +1,37 @@
+{
+  "name": "k8s-setup",
+  "version": "1.0.0",
+  "description": "Cloud-agnostic Kubernetes cluster deployment with Pulumi (AWS EKS, GCP GKE, Azure AKS)",
+  "main": "src/index.ts",
+  "scripts": {
+    "preview": "pulumi preview",
+    "up": "pulumi up",
+    "destroy": "pulumi destroy",
+    "stack:dev": "pulumi stack select dev",
+    "stack:staging": "pulumi stack select staging",
+    "stack:prod": "pulumi stack select prod"
+  },
+  "keywords": [
+    "pulumi",
+    "kubernetes",
+    "eks",
+    "gke",
+    "aks",
+    "infrastructure-as-code"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@pulumi/pulumi": "^3.213.0",
+    "@pulumi/aws": "^7.15.0",
+    "@pulumi/awsx": "^3.1.0",
+    "@pulumi/eks": "^4.2.0",
+    "@pulumi/gcp": "9.6.0",
+    "@pulumi/azure-native": "^3.12.0",
+    "@pulumi/kubernetes": "^4.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}

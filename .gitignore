@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.js
+*.js.map
+*.d.ts
+!jest.config.js
+
+# Pulumi
+.pulumi/
+Pulumi.*.yaml.bak
+
+# Pulumi Stack Configs (contain sensitive data like project IDs, regions, etc.)
+# Use Pulumi.*.yaml.example as templates
+Pulumi.dev*.yaml
+Pulumi.staging*.yaml
+Pulumi.prod*.yaml
+!Pulumi.*.yaml.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.pem
+*.key
+secrets/
+.env
+.env.*
+!.env.example
+
+# Kubernetes configs (contain cluster credentials)
+kubeconfig
+kubeconfig.yaml
+kubeconfig*.yaml
+*.kubeconfig
+
+# Logs
+*.log
+logs/
+
+# Lock files (optional - some prefer to commit these)
+# package-lock.json

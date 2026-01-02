@@ -1,0 +1,23 @@
+# Example Pulumi stack configuration for GCP GKE
+# Copy this file to Pulumi.<stack-name>.yaml and fill in your values
+config:
+  k8s-setup:cloudProvider: gcp
+  k8s-setup:region: europe-west1
+  k8s-setup:environment: dev
+  k8s-setup:projectName: my-k8s
+  k8s-setup:kubernetesVersion: "1.31"
+  # Replace with your GCP project ID
+  gcp:project: your-gcp-project-id
+  k8s-setup:nodePools: |-
+    [
+      {
+        "name": "default",
+        "instanceSize": "small",
+        "minSize": 1,
+        "maxSize": 3,
+        "desiredSize": 1,
+        "diskSizeGb": 20,
+        "labels": { "role": "worker" }
+      }
+    ]
+

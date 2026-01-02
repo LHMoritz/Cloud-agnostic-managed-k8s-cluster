@@ -1,0 +1,21 @@
+# Example Pulumi stack configuration for AWS EKS
+# Copy this file to Pulumi.dev.yaml and fill in your values
+config:
+  k8s-setup:cloudProvider: aws
+  k8s-setup:region: eu-central-1
+  k8s-setup:environment: dev
+  k8s-setup:projectName: my-k8s
+  k8s-setup:kubernetesVersion: "1.31"
+  k8s-setup:nodePools: |-
+    [
+      {
+        "name": "default",
+        "instanceSize": "small",
+        "minSize": 1,
+        "maxSize": 3,
+        "desiredSize": 1,
+        "diskSizeGb": 20,
+        "labels": { "role": "worker" }
+      }
+    ]
+
