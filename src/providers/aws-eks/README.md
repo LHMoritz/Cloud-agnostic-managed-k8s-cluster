@@ -115,12 +115,15 @@ config:
 ## Connect with kubectl
 
 ```bash
-# Export kubeconfig
+# Option 1: Using setup script (recommended - works in all terminals)
+./scripts/setup-kubeconfig.sh <stack-name>
+
+# Option 2: Via AWS CLI
+aws eks update-kubeconfig --name <cluster-name> --region eu-central-1
+
+# Option 3: Manual export (current terminal only)
 pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml
 export KUBECONFIG=./kubeconfig.yaml
-
-# Or via AWS CLI
-aws eks update-kubeconfig --name <cluster-name> --region eu-central-1
 
 # Test connection
 kubectl get nodes

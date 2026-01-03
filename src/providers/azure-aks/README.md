@@ -135,12 +135,15 @@ config:
 ## Connect with kubectl
 
 ```bash
-# Export kubeconfig
+# Option 1: Using setup script (recommended - works in all terminals)
+./scripts/setup-kubeconfig.sh <stack-name>
+
+# Option 2: Via Azure CLI
+az aks get-credentials --resource-group my-k8s-rg --name my-k8s-dev
+
+# Option 3: Manual export (current terminal only)
 pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml
 export KUBECONFIG=./kubeconfig.yaml
-
-# Or via Azure CLI
-az aks get-credentials --resource-group my-k8s-rg --name my-k8s-dev
 
 # Test connection
 kubectl get nodes

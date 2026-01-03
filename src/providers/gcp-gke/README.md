@@ -151,12 +151,15 @@ config:
 ## Connect with kubectl
 
 ```bash
-# Export kubeconfig
+# Option 1: Using setup script (recommended - works in all terminals)
+./scripts/setup-kubeconfig.sh <stack-name>
+
+# Option 2: Via gcloud CLI
+gcloud container clusters get-credentials <cluster-name> --region europe-west1
+
+# Option 3: Manual export (current terminal only)
 pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml
 export KUBECONFIG=./kubeconfig.yaml
-
-# Or via gcloud
-gcloud container clusters get-credentials <cluster-name> --region europe-west1
 
 # Test connection
 kubectl get nodes

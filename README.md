@@ -23,6 +23,8 @@ k8s-setup/
 │       ├── aws-eks/          # AWS EKS module + README
 │       ├── gcp-gke/          # GCP GKE module + README
 │       └── azure-aks/        # Azure AKS module + README
+├── scripts/
+│   └── setup-kubeconfig.sh   # kubectl access helper
 ├── Pulumi.yaml               # Pulumi project configuration
 ├── Pulumi.*.yaml.example     # Example stack configurations
 ├── package.json
@@ -55,8 +57,7 @@ pulumi config set projectName my-k8s
 pulumi up
 
 # 5. Connect with kubectl
-pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml
-export KUBECONFIG=./kubeconfig.yaml
+./scripts/setup-kubeconfig.sh dev
 kubectl get nodes
 ```
 
@@ -125,6 +126,40 @@ Pulumi stores state in Pulumi Cloud by default. For self-hosted state, see provi
 # Return to Pulumi Cloud
 pulumi login
 ```
+
+## Access Cluster with kubectl
+
+After deploying, configure kubectl access:
+
+### Option 1: Using the setup script (recommended)
+
+```bash
+# Configure kubectl access (works in all terminals)
+./scripts/setup-kubeconfig.sh <stack-name>
+
+# Test connection
+kubectl get nodes
+```
+
+The script merges the cluster config into `~/.kube/config` and makes it available system-wide.
+
+### Option 2: Manual export
+
+```bash
+# Export kubeconfig to file
+pulumi stack output kubeconfig --show-secrets > kubeconfig.yaml
+export KUBECONFIG=./kubeconfig.yaml
+
+# Test connection
+kubectl get nodes
+```
+
+### Option 3: Provider-specific CLI tools
+
+See provider-specific READMEs for alternative methods:
+- AWS: `aws eks update-kubeconfig --name <cluster-name> --region <region>`
+- GCP: `gcloud container clusters get-credentials <cluster-name> --region <region>`
+- Azure: `az aks get-credentials --resource-group <rg> --name <cluster-name>`
 
 ## Stack Management
 
