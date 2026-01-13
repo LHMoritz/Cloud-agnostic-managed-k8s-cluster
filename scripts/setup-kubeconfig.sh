@@ -9,9 +9,34 @@ set -euo pipefail
 STACK="${1:-dev}"
 TEMP_KUBECONFIG="/tmp/pulumi-kubeconfig-$STACK.yaml"
 
-echo "📦 Fetching kubeconfig from Pulumi stack: $STACK"
-pulumi stack select "$STACK"
-pulumi stack output kubeconfig --show-secrets > "$TEMP_KUBECONFIG"
+echo "📦 Fetching stack outputs..."
+STACK_OUTPUTS=$(pulumi stack output --json)
+CLOUD_PROVIDER=$(echo "$STACK_OUTPUTS" | jq -r '.cloudProvider // empty')
+
+if [ "$CLOUD_PROVIDER" == "azure" ]; then
+  echo "☁️  Detected Azure cluster. Using 'az aks get-credentials' for AAD support."
+  
+  CLUSTER_NAME=$(echo "$STACK_OUTPUTS" | jq -r '.clusterName')
+  CLUSTER_ID=$(echo "$STACK_OUTPUTS" | jq -r '.clusterId')
+  # Extract Resource Group name from the Cluster ID
+  # ID format: /subscriptions/<sub-id>/resourcegroups/<rg-name>/providers/Microsoft.ContainerService/managedClusters/<cluster-name>
+  RESOURCE_GROUP=$(echo "$CLUSTER_ID" | sed -E 's/.*resourcegroups\/([^\/]*)\/.*/\1/I')
+
+  echo "   Cluster: $CLUSTER_NAME"
+  echo "   Resource Group: $RESOURCE_GROUP"
+
+  # Use az aks get-credentials to generate a fresh kubeconfig with correct AAD settings
+  az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME" --file "$TEMP_KUBECONFIG" --overwrite-existing
+  
+  # Check if kubelogin is installed (often needed for AAD non-interactive login)
+  if ! command -v kubelogin &> /dev/null; then
+    echo "⚠️  Warning: 'kubelogin' is not found. You may need it for Azure AAD authentication."
+    echo "   Install it with: az aks install-cli or brew install Azure/kubelogin/kubelogin"
+  fi
+else
+  echo "☁️  Detected provider: ${CLOUD_PROVIDER:-unknown}. Using Pulumi kubeconfig output."
+  echo "$STACK_OUTPUTS" | jq -r '.kubeconfig' > "$TEMP_KUBECONFIG"
+fi
 
 # Create ~/.kube directory if it doesn't exist
 mkdir -p ~/.kube
