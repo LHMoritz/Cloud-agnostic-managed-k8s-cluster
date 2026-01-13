@@ -22,17 +22,28 @@ if [ -f ~/.kube/config ]; then
   cp ~/.kube/config ~/.kube/config.backup-$(date +%s)
 fi
 
-# Merge kubeconfig into ~/.kube/config
+# Get cluster context name from the temp kubeconfig
+CONTEXT_NAME=$(kubectl --kubeconfig="$TEMP_KUBECONFIG" config current-context)
+
+# Delete existing context/cluster/user if they exist (to force update with new endpoint)
+if [ -f ~/.kube/config ]; then
+  echo "🧹 Removing old context if it exists: $CONTEXT_NAME"
+  kubectl config delete-context "$CONTEXT_NAME" 2>/dev/null || true
+  kubectl config delete-cluster "$CONTEXT_NAME" 2>/dev/null || true
+  kubectl config delete-user "$CONTEXT_NAME" 2>/dev/null || true
+fi
+
+# Merge kubeconfig into ~/.kube/config using KUBECONFIG environment variable
 echo "🔗 Merging kubeconfig into ~/.kube/config"
 if [ -f ~/.kube/config ]; then
-  KUBECONFIG=~/.kube/config:$TEMP_KUBECONFIG kubectl config view --flatten > ~/.kube/config.tmp
+  # Use KUBECONFIG to merge, then flatten and write back
+  export KUBECONFIG="$HOME/.kube/config:$TEMP_KUBECONFIG"
+  kubectl config view --flatten > ~/.kube/config.tmp
   mv ~/.kube/config.tmp ~/.kube/config
+  unset KUBECONFIG
 else
   cp "$TEMP_KUBECONFIG" ~/.kube/config
 fi
-
-# Get cluster context name from the temp kubeconfig
-CONTEXT_NAME=$(kubectl --kubeconfig="$TEMP_KUBECONFIG" config current-context)
 
 # Switch to the new context
 echo "🔄 Switching to context: $CONTEXT_NAME"
@@ -41,7 +52,8 @@ kubectl config use-context "$CONTEXT_NAME"
 # Cleanup
 rm "$TEMP_KUBECONFIG"
 
-echo "Test connection:"
+echo ""
+echo "✅ Done! Test connection:"
 echo "  kubectl get nodes"
 echo ""
 echo "Switch context later:"
