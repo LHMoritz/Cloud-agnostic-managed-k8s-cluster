@@ -17,6 +17,7 @@ Pulumi.*.yaml.bak
 Pulumi.dev*.yaml
 Pulumi.staging*.yaml
 Pulumi.prod*.yaml
+Pulumi.aurora-test.yaml
 !Pulumi.*.yaml.example
 
 # IDE

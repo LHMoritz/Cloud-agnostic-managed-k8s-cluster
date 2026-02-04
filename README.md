@@ -86,7 +86,7 @@ pulumi config set azureResourceGroup <your-resource-group>
 ```bash
 pulumi config set environment dev
 pulumi config set projectName my-k8s
-pulumi config set kubernetesVersion 1.29
+pulumi config set kubernetesVersion 1.34
 ```
 
 ### Node Pools (Optional)
