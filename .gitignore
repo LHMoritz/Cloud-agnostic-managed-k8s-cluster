@@ -14,12 +14,8 @@ Pulumi.*.yaml.bak
 
 # Pulumi Stack Configs (contain sensitive data like project IDs, regions, etc.)
 # Use Pulumi.*.yaml.example as templates
-Pulumi.dev*.yaml
-Pulumi.staging*.yaml
-Pulumi.prod*.yaml
-Pulumi.aurora-test.yaml
-!Pulumi.*.yaml.example
-
+Pulumi.*.yaml
+!Pulumi.*.example.yaml
 # IDE
 .idea/
 .vscode/
