@@ -26,7 +26,7 @@ if [ "$CLOUD_PROVIDER" == "azure" ]; then
   echo "   Resource Group: $RESOURCE_GROUP"
 
   # Use az aks get-credentials to generate a fresh kubeconfig with correct AAD settings
-  az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME" --file "$TEMP_KUBECONFIG" --overwrite-existing
+  az aks get-credentials --resource-group "$RESOURCE_GROUP" --name "$CLUSTER_NAME" --file "$TEMP_KUBECONFIG" --overwrite-existing --admin
   
   # Check if kubelogin is installed (often needed for AAD non-interactive login)
   if ! command -v kubelogin &> /dev/null; then
@@ -47,15 +47,21 @@ if [ -f ~/.kube/config ]; then
   cp ~/.kube/config ~/.kube/config.backup-$(date +%s)
 fi
 
-# Get cluster context name from the temp kubeconfig
+# Extract context name, cluster name, and user name from the temp kubeconfig
 CONTEXT_NAME=$(kubectl --kubeconfig="$TEMP_KUBECONFIG" config current-context)
+CLUSTER_NAME_IN_KC=$(kubectl --kubeconfig="$TEMP_KUBECONFIG" config view -o jsonpath="{.contexts[?(@.name==\"$CONTEXT_NAME\")].context.cluster}")
+USER_NAME_IN_KC=$(kubectl --kubeconfig="$TEMP_KUBECONFIG" config view -o jsonpath="{.contexts[?(@.name==\"$CONTEXT_NAME\")].context.user}")
 
 # Delete existing context/cluster/user if they exist (to force update with new endpoint)
+# This ensures stale entries from a previous cluster with the same name are fully removed
 if [ -f ~/.kube/config ]; then
-  echo "🧹 Removing old context if it exists: $CONTEXT_NAME"
+  echo "🧹 Removing old entries if they exist..."
+  echo "   Context: $CONTEXT_NAME"
+  echo "   Cluster: $CLUSTER_NAME_IN_KC"
+  echo "   User:    $USER_NAME_IN_KC"
   kubectl config delete-context "$CONTEXT_NAME" 2>/dev/null || true
-  kubectl config delete-cluster "$CONTEXT_NAME" 2>/dev/null || true
-  kubectl config delete-user "$CONTEXT_NAME" 2>/dev/null || true
+  kubectl config delete-cluster "$CLUSTER_NAME_IN_KC" 2>/dev/null || true
+  kubectl config delete-user "$USER_NAME_IN_KC" 2>/dev/null || true
 fi
 
 # Merge kubeconfig into ~/.kube/config using KUBECONFIG environment variable

@@ -96,14 +96,37 @@ export function createAksCluster(config: ClusterConfig): ClusterOutput {
     // Azure AD integration (optional)
     aadProfile: config.azure.enableAzureAd
       ? {
-          managed: true,
-          enableAzureRBAC: true,
-        }
+        managed: true,
+        enableAzureRBAC: true,
+      }
       : undefined,
 
     // Auto-upgrade channel
     autoUpgradeProfile: {
       upgradeChannel: "patch",
+    },
+
+    // OIDC Issuer (required for Workload Identity)
+    oidcIssuerProfile: {
+      enabled: true,
+    },
+
+    // Workload Identity
+    securityProfile: {
+      workloadIdentity: {
+        enabled: true,
+      },
+    },
+
+    // Add-ons: Azure Key Vault Secrets Provider (CSI Driver)
+    addonProfiles: {
+      azureKeyvaultSecretsProvider: {
+        enabled: true,
+        config: {
+          enableSecretRotation: "true",
+          rotationPollInterval: "2m",
+        },
+      },
     },
 
     // SKU
